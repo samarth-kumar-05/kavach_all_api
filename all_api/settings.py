@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "upi_api",
-    "rest_framework"
+    "rest_framework",
+    "sms"
 ]
 
 MIDDLEWARE = [
@@ -122,6 +123,7 @@ STATIC_ROOT =os.path.join(BASE_DIR, 'staticfiles')
 CSRF_TRUSTED_ORIGINS = [
     'https://django-server-production-6d04.up.railway.app/'
 ]
+
 
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
