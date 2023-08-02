@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "upi_api",
     "rest_framework",
-    "sms"
+    "sms",
+    "phone"
 ]
 
 MIDDLEWARE = [
