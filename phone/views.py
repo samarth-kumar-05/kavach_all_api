@@ -29,6 +29,7 @@ class PhoneQuery(APIView):
             else:
                 print("Start")
                 carrier = get_phone_data(data)
+                print(carrier+"JHAHHQHQHW")
 
                 if(not carrier):
                     print(carrier + " No Carrier Found")
