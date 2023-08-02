@@ -31,9 +31,8 @@ class PhoneQuery(APIView):
                 carrier = get_phone_data(data)
                 print(carrier+"JHAHHQHQHW")
 
-                if(not carrier):
-                    print(carrier + " No Carrier Found")
                 if(carrier):
+                    print("CArrier Found block")
                     new_dict = {
                         "phone_number":data,
                         "is_spam":"false",
@@ -41,6 +40,7 @@ class PhoneQuery(APIView):
                     }
                     return Response(new_dict)
                 elif not carrier:
+                    print("CArrier not Found block")
                     new_data = {"phone_number":data,"spam_mark":1}
                     serializer = PhoneNumberSerializer(data=new_data)
 

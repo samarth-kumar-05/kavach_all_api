@@ -13,6 +13,6 @@ def get_phone_data(number):
     }
 
     response = requests.get(url, headers=headers, params=querystring)
-    print(response)
+    print(response.json())
     return response.json()["carrier"]
 
