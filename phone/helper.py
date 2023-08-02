@@ -1,6 +1,7 @@
 import requests
 
 def get_phone_data(number):
+    print("Method started")
 
     url = "https://veriphone.p.rapidapi.com/verify"
 
@@ -12,5 +13,6 @@ def get_phone_data(number):
     }
 
     response = requests.get(url, headers=headers, params=querystring)
+    print(response)
     return response.json()["carrier"]
 
