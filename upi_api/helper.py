@@ -23,7 +23,8 @@ def getNameFromUPI(upi_id):
     }
     headers = {
         "content-type": "application/json",
-        "X-RapidAPI-Key": "0a485dc436mshe19daf44c99bcc2p19ea5fjsn60f17e06b696",
+        # "X-RapidAPI-Key": "0a485dc436mshe19daf44c99bcc2p19ea5fjsn60f17e06b696",
+        "X-RapidAPI-Key": "48b3d65f9amshc48aa42b58eb01bp11c105jsn29653c059ea1",
         "X-RapidAPI-Host": "upi-verification.p.rapidapi.com"
     }
     response = requests.post(url, json=payload, headers=headers)
