@@ -21,6 +21,7 @@ class PhoneQuery(APIView):
 
                 new_dict = {
                     "phone_number":res.phone_number,
+                    "carrier":res.carrier,
                     "is_spam":"true",
                     "spam_marks":res.spam_mark
                 }
@@ -32,22 +33,29 @@ class PhoneQuery(APIView):
                 print(carrier+"JHAHHQHQHW")
 
                 if(carrier):
-                    print("CArrier Found block")
+                    print("Carrier Found block")
                     new_dict = {
                         "phone_number":data,
+                        "carrier":carrier,
                         "is_spam":"false",
                         "spam_marks":0
                     }
                     return Response(new_dict)
                 elif not carrier:
+                    carr = "not_found"
                     print("CArrier not Found block")
-                    new_data = {"phone_number":data,"spam_mark":1}
+                    new_data = {"phone_number":data,"spam_mark":1,"carrier":carr}
                     serializer = PhoneNumberSerializer(data=new_data)
 
+                    print("seralizer block start in carrier not found")
+
                     if serializer.is_valid():
+                        print("in seralizer block in carrier not found")
                         serializer.save()
+                        print("seralizer block save in carrier not found")
                         new_dict = {
                             "phone_number":data,
+                            "carrier":carr,
                             "is_spam":"true",
                             "spam_marks":1
                         }
@@ -69,6 +77,7 @@ class SpamMark(APIView):
             spam_marks = header_data.spam_mark+1
             new_dict = {
                 "phone_number":header_data.phone_number,
+                "carrier":header_data.carrier,
                 "is_spam":"true",
                 "spam_mark":spam_marks
             }
@@ -81,6 +90,7 @@ class SpamMark(APIView):
 
                 new_dict = {
                         "phone_number":header_data.phone_number,
+                        "carrier":header_data.carrier,
                         "is_spam":"true",
                         "spam_marks":header_data.spam_mark
                 }
@@ -90,18 +100,24 @@ class SpamMark(APIView):
                 return Response("Please Provide a valid Phone Number ", status=status.HTTP_400_BAD_REQUEST)
             
         else:
-            data = {
+            carrier = get_phone_data(data)
+
+            if(not carrier):
+                carrier = "not_found"
+            new_data = {
                 "phone_number" : data,
+                "carrier":carrier,
                 "spam_mark":1
             }
 
-            serializer = PhoneNumberSerializer(data=data)
+            serializer = PhoneNumberSerializer(data=new_data)
 
             if serializer.is_valid():
                 serializer.save()
 
                 new_dict = {
                     "phone_number":data,
+                    "carrier":carrier,
                     "is_spam":"true",
                     "spam_marks":1
                 }
