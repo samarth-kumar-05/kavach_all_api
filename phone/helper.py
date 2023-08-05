@@ -14,5 +14,16 @@ def get_phone_data(number):
 
     response = requests.get(url, headers=headers, params=querystring)
     print(response.json())
-    return response.json()["carrier"]
+
+    data = {
+        "carrier":response.json()["carrier"],
+        "phone_region":response.json()["phone_region"]
+    }
+
+    print("DATA IN HELPER")
+    print(data)
+
+    print("HELPER ENDED")
+
+    return data
 

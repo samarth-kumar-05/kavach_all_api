@@ -11,9 +11,11 @@ from .helper import get_phone_data
 
 # Create your views here.
 class PhoneQuery(APIView):
-    def get(self,request):
+    def get(self,request,**kwargs):
         try:
-            data = int(request.data.get("phone_number"))
+            data = self.kwargs["number"]
+            if(len(data) == 10):
+                data = "+91"+data
             print(data)
 
             if PhoneNumber.objects.filter(phone_number = data).exists():
@@ -22,6 +24,7 @@ class PhoneQuery(APIView):
                 new_dict = {
                     "phone_number":res.phone_number,
                     "carrier":res.carrier,
+                    "phone_region":res.phone_region,
                     "is_spam":"true",
                     "spam_marks":res.spam_mark
                 }
@@ -29,14 +32,19 @@ class PhoneQuery(APIView):
                 return Response(new_dict)
             else:
                 print("Start")
-                carrier = get_phone_data(data)
-                print(carrier+"JHAHHQHQHW")
+                helper_data = get_phone_data(data)
+                print("PRINTING HELPER DATA")
+                print(helper_data)
+
+                carrier = helper_data["carrier"]
+                phone_region = helper_data["phone_region"]
 
                 if(carrier):
                     print("Carrier Found block")
                     new_dict = {
                         "phone_number":data,
                         "carrier":carrier,
+                        "phone_region":phone_region,
                         "is_spam":"false",
                         "spam_marks":0
                     }
@@ -44,7 +52,7 @@ class PhoneQuery(APIView):
                 elif not carrier:
                     carr = "not_found"
                     print("CArrier not Found block")
-                    new_data = {"phone_number":data,"spam_mark":1,"carrier":carr}
+                    new_data = {"phone_number":data,"spam_mark":1,"carrier":carr,"phone_region":phone_region}
                     serializer = PhoneNumberSerializer(data=new_data)
 
                     print("seralizer block start in carrier not found")
@@ -56,6 +64,7 @@ class PhoneQuery(APIView):
                         new_dict = {
                             "phone_number":data,
                             "carrier":carr,
+                            "phone_region":phone_region,
                             "is_spam":"true",
                             "spam_marks":1
                         }
@@ -67,9 +76,10 @@ class PhoneQuery(APIView):
             return Response("Please Enter Valid Number",status = status.HTTP_400_BAD_REQUEST)
         
 class SpamMark(APIView):
-    def put(self,request):
-        data = int(request.data.get("phone_number"))
-
+    def put(self,request,**kwargs):
+        data = self.kwargs["number"]
+        if(len(data) == 10):
+            data = "+91"+data
         if PhoneNumber.objects.filter(phone_number=data).exists():
             print("Working start")
             header_data = PhoneNumber.objects.get(phone_number=data)
@@ -78,6 +88,7 @@ class SpamMark(APIView):
             new_dict = {
                 "phone_number":header_data.phone_number,
                 "carrier":header_data.carrier,
+                "phone_region":header_data.phone_region,
                 "is_spam":"true",
                 "spam_mark":spam_marks
             }
@@ -91,6 +102,7 @@ class SpamMark(APIView):
                 new_dict = {
                         "phone_number":header_data.phone_number,
                         "carrier":header_data.carrier,
+                        "phone_region":header_data.phone_region,
                         "is_spam":"true",
                         "spam_marks":header_data.spam_mark
                 }
@@ -100,13 +112,17 @@ class SpamMark(APIView):
                 return Response("Please Provide a valid Phone Number ", status=status.HTTP_400_BAD_REQUEST)
             
         else:
-            carrier = get_phone_data(data)
+            helper_data = get_phone_data(data)
+
+            carrier = helper_data["carrier"]
+            phone_region = helper_data["phone_region"]
 
             if(not carrier):
                 carrier = "not_found"
             new_data = {
                 "phone_number" : data,
                 "carrier":carrier,
+                "phone_region":phone_region,
                 "spam_mark":1
             }
 
@@ -118,6 +134,7 @@ class SpamMark(APIView):
                 new_dict = {
                     "phone_number":data,
                     "carrier":carrier,
+                    "phone_region":phone_region,
                     "is_spam":"true",
                     "spam_marks":1
                 }
@@ -130,8 +147,8 @@ class SpamMark(APIView):
 class Test(APIView):
     def get(self,request):
         data = (
-            ("GET","/phone/query"),
-            ("PUT","/phone/flag_spam"),
+            ("GET","/phone/query/<str:number>"),
+            ("PUT","/phone/flag_spam/<str:number>"),
         )
         return Response(data)
 
