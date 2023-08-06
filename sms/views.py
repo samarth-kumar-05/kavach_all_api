@@ -13,6 +13,7 @@ class HeaderQuery(APIView):
     def get(self,request,**kwargs):
         try:
             header = self.kwargs["header"] 
+            print(header)
             if SMSHeaders.objects.filter(name = header).exists():
                 header_details = SMSHeaders.objects.get(name = header)
                 num_spams = header_details.spam_mark
@@ -26,7 +27,11 @@ class HeaderQuery(APIView):
                 return Response(new_dict)
             else:
 
+                print("ELSE BLOCK STARTED")
+
                 message = request.data.get("message")
+
+                print(message)
 
                 url = "https://kavach-api.onrender.com/message"
                 context = {
@@ -36,8 +41,10 @@ class HeaderQuery(APIView):
                 print("requesting data")
 
                 data = requests.post(url=url,json=context)
+                
 
                 print("request send")
+                print(data)
 
                 data_json = data.json()
 
