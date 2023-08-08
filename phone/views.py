@@ -75,6 +75,7 @@ class PhoneQuery(APIView):
         except:
             return Response("Please Enter Valid Number",status = status.HTTP_400_BAD_REQUEST)
         
+    
 class SpamMark(APIView):
     def put(self,request,**kwargs):
         data = self.kwargs["number"]
@@ -142,6 +143,20 @@ class SpamMark(APIView):
                 return Response(new_dict)
             else:
                 return Response("Please Provide a valid Phone Number ", status=status.HTTP_400_BAD_REQUEST)
+        
+class DeletePhoneNumber(APIView):
+    def delete(self,request,**kwargs):
+            data = self.kwargs["number"]
+            print(data)
+
+            if PhoneNumber.objects.filter(phone_number = data).exists():
+                res = PhoneNumber.objects.get(phone_number = data)
+
+                res.delete()
+                return Response("Phone Number Deleted")
+            else:
+                return Response("POHONE NUMBER DOES'NT EXIST IN DATABASE")
+        
 
 
 class Test(APIView):

@@ -47,6 +47,18 @@ class UpiQuery(APIView):
         # updated_data.append({'name':'samarth'})
         return Response(newDict)
     
+    def delete(self,request,**kwargs):
+        upi_idd = self.kwargs["upi_id"]
+        if UPIAddress.objects.filter(upi_id = upi_idd).exists():
+                data = UPIAddress.objects.get(upi_id=upi_idd)
+
+                data.delete()
+
+                return Response("UPI ADDRESS REMOVED FROM SPAM LIST")
+        else:
+            return Response("UPI ADDRESS DOESN'T EXISTS IN SPAM LIST")
+
+    
     # def put(self,request,**kwargs):
     #     upi_idd = self.kwargs["upi_id"]
     #     upi_details = UPIAddress.objects.get(upi_id = upi_idd)
