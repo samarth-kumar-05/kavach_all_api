@@ -6,6 +6,7 @@ class PhoneNumber(models.Model):
     carrier = models.CharField(max_length=200)
     phone_region = models.CharField(max_length=250)
     spam_mark = models.IntegerField()
+    ham_mark = models.IntegerField()
 
     def __str__(self):
         return self.phone_number

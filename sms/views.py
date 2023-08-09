@@ -2,6 +2,8 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+import re
+import json
 
 import requests
 
@@ -12,6 +14,29 @@ from sms.serializers import SMSHeaderSerializer
 class HeaderQuery(APIView):
     def get(self,request,**kwargs):
         try:
+            message = request.data.get("message")
+
+            print(message)
+
+            # regex=r"\b((?:https?://)?(?:(?:www\.)?(?:[\da-z\.-]+)\.(?:[a-z]{2,6})|(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)|(?:(?:[0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|(?:[0-9a-fA-F]{1,4}:){1,7}:|(?:[0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|(?:[0-9a-fA-F]{1,4}:){1,5}(?::[0-9a-fA-F]{1,4}){1,2}|(?:[0-9a-fA-F]{1,4}:){1,4}(?::[0-9a-fA-F]{1,4}){1,3}|(?:[0-9a-fA-F]{1,4}:){1,3}(?::[0-9a-fA-F]{1,4}){1,4}|(?:[0-9a-fA-F]{1,4}:){1,2}(?::[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:(?:(?::[0-9a-fA-F]{1,4}){1,6})|:(?:(?::[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(?::[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(?:ffff(?::0{1,4}){0,1}:){0,1}(?:(?:25[0-5]|(?:2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(?:25[0-5]|(?:2[0-4]|1{0,1}[0-9]){0,1}[0-9])|(?:[0-9a-fA-F]{1,4}:){1,4}:(?:(?:25[0-5]|(?:2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(?:25[0-5]|(?:2[0-4]|1{0,1}[0-9]){0,1}[0-9])))(?::[0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])?(?:/[\w\.-]*)*/?)\b"
+            # matches = re.findall(regex, message)
+            # print(matches)
+
+            # url_context = {}
+            # i=0
+            # for url in matches:
+            #     result = requests.post("https://kavach-api.onrender.com/url",json= {
+            #         "url":url
+            #     })
+            #     new = {
+            #         "name":url,
+            #         "result":json.loads(result.text)
+            #     }
+            #     url_context.update({i:new})
+            #     i+=1
+
+            # print(url_context)
+            print("printing header data")
             header = self.kwargs["header"] 
             print(header)
             if SMSHeaders.objects.filter(name = header).exists():
@@ -23,6 +48,8 @@ class HeaderQuery(APIView):
                     "is_spam": True,
                     "number_of_spam_marks" : num_spams
                 }
+
+                # new_dict.update({"links":url_context})
 
                 return Response(new_dict)
             else:
@@ -60,6 +87,7 @@ class HeaderQuery(APIView):
                         "is_spam" : False,
                         "number_of_spam_marks" : 0
                     }
+                    # new_dict.update({"links":url_context})
 
                     return Response(new_dict)
                 
@@ -77,6 +105,8 @@ class HeaderQuery(APIView):
                         "is_spam" : True,
                         "number_of_spam_marks" : 1
                     }
+
+                    # new_dict.update({"links":url_context})
 
                 return Response(new_dict)
             

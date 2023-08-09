@@ -25,8 +25,8 @@ class PhoneQuery(APIView):
                     "phone_number":res.phone_number,
                     "carrier":res.carrier,
                     "phone_region":res.phone_region,
-                    "is_spam":"true",
-                    "spam_marks":res.spam_mark
+                    "spam_marks":res.spam_mark,
+                    "ham_marks":res.ham_mark,
                 }
 
                 return Response(new_dict)
@@ -39,41 +39,49 @@ class PhoneQuery(APIView):
                 carrier = helper_data["carrier"]
                 phone_region = helper_data["phone_region"]
 
-                if(carrier):
-                    print("Carrier Found block")
+                print(carrier)
+                print(phone_region)
+
+                    # print("Carrier Found block")
+                    # new_dict = {
+                    #     "phone_number":data,
+                    #     "carrier":carrier,
+                    #     "phone_region":phone_region,
+                    #     "is_spam":"false",
+                    #     "spam_marks":0
+                    # }
+                    # return Response(new_dict)
+                if not carrier:
+                    carrier = "not_found"
+
+                print("Data Ready for serialization")
+                
+                new_data = {"phone_number":int(data),"spam_mark":0,"carrier":carrier,"phone_region":phone_region,"ham_mark":0}
+                serializerr = PhoneNumberSerializer(data=new_data)
+
+                print("seralizer block start in carrier not found")
+
+                if serializerr.is_valid():
+                    print("in seralizer block in carrier not found")
+                    print(serializerr)
+                    serializerr.save()
+                    print("seralizer block save in carrier not found")
                     new_dict = {
                         "phone_number":data,
                         "carrier":carrier,
                         "phone_region":phone_region,
-                        "is_spam":"false",
-                        "spam_marks":0
+                        "spam_marks":0,
+                        "ham_mark":0,
                     }
+
+
+                    print(new_dict)
+
                     return Response(new_dict)
-                elif not carrier:
-                    carr = "not_found"
-                    print("CArrier not Found block")
-                    new_data = {"phone_number":data,"spam_mark":1,"carrier":carr,"phone_region":phone_region}
-                    serializer = PhoneNumberSerializer(data=new_data)
-
-                    print("seralizer block start in carrier not found")
-
-                    if serializer.is_valid():
-                        print("in seralizer block in carrier not found")
-                        serializer.save()
-                        print("seralizer block save in carrier not found")
-                        new_dict = {
-                            "phone_number":data,
-                            "carrier":carr,
-                            "phone_region":phone_region,
-                            "is_spam":"true",
-                            "spam_marks":1
-                        }
-
-                        return Response(new_dict)
-                    else:
-                        return Response("Please Enter a Valid Number",status = status.HTTP_400_BAD_REQUEST)
+                else:
+                    return Response("Please Enter a Valid Number",status = status.HTTP_400_BAD_REQUEST)
         except:
-            return Response("Please Enter Valid Number",status = status.HTTP_400_BAD_REQUEST)
+            return Response("Please Enter Valid Number except block",status = status.HTTP_400_BAD_REQUEST)
         
     
 class SpamMark(APIView):
@@ -90,8 +98,8 @@ class SpamMark(APIView):
                 "phone_number":header_data.phone_number,
                 "carrier":header_data.carrier,
                 "phone_region":header_data.phone_region,
-                "is_spam":"true",
-                "spam_mark":spam_marks
+                "spam_mark":spam_marks,
+                "ham_mark":header_data.ham_mark
             }
             serializer = PhoneNumberSerializer(header_data,data=new_dict)
 
@@ -104,8 +112,8 @@ class SpamMark(APIView):
                         "phone_number":header_data.phone_number,
                         "carrier":header_data.carrier,
                         "phone_region":header_data.phone_region,
-                        "is_spam":"true",
-                        "spam_marks":header_data.spam_mark
+                        "spam_marks":header_data.spam_mark,
+                        "ham_marks":header_data.ham_mark
                 }
 
                 return Response(new_dict)
@@ -124,7 +132,8 @@ class SpamMark(APIView):
                 "phone_number" : data,
                 "carrier":carrier,
                 "phone_region":phone_region,
-                "spam_mark":1
+                "spam_mark":1,
+                "ham_mark":0
             }
 
             serializer = PhoneNumberSerializer(data=new_data)
@@ -136,8 +145,78 @@ class SpamMark(APIView):
                     "phone_number":data,
                     "carrier":carrier,
                     "phone_region":phone_region,
-                    "is_spam":"true",
-                    "spam_marks":1
+                    "spam_marks":1,
+                    "ham_mark":0
+                }
+
+                return Response(new_dict)
+            else:
+                return Response("Please Provide a valid Phone Number ", status=status.HTTP_400_BAD_REQUEST)
+        
+
+class HamMark(APIView):
+    def put(self,request,**kwargs):
+        data = self.kwargs["number"]
+        if(len(data) == 10):
+            data = "+91"+data
+        if PhoneNumber.objects.filter(phone_number=data).exists():
+            print("Working start")
+            header_data = PhoneNumber.objects.get(phone_number=data)
+
+            ham_mark = header_data.ham_mark+1
+            new_dict = {
+                "phone_number":header_data.phone_number,
+                "carrier":header_data.carrier,
+                "phone_region":header_data.phone_region,
+                "spam_mark":header_data.spam_mark,
+                "ham_mark":ham_mark
+            }
+            serializer = PhoneNumberSerializer(header_data,data=new_dict)
+
+            print("WOrking till serilizer")
+
+            if(serializer.is_valid()):
+                serializer.save()
+
+                new_dict = {
+                        "phone_number":header_data.phone_number,
+                        "carrier":header_data.carrier,
+                        "phone_region":header_data.phone_region,
+                        "spam_marks":header_data.spam_mark,
+                        "ham_marks":ham_mark
+                }
+
+                return Response(new_dict)
+            else:
+                return Response("Please Provide a valid Phone Number ", status=status.HTTP_400_BAD_REQUEST)
+            
+        else:
+            helper_data = get_phone_data(data)
+
+            carrier = helper_data["carrier"]
+            phone_region = helper_data["phone_region"]
+
+            if(not carrier):
+                carrier = "not_found"
+            new_data = {
+                "phone_number" : data,
+                "carrier":carrier,
+                "phone_region":phone_region,
+                "spam_mark":0,
+                "ham_mark":1
+            }
+
+            serializer = PhoneNumberSerializer(data=new_data)
+
+            if serializer.is_valid():
+                serializer.save()
+
+                new_dict = {
+                    "phone_number":data,
+                    "carrier":carrier,
+                    "phone_region":phone_region,
+                    "spam_marks":0,
+                    "ham_mark":1
                 }
 
                 return Response(new_dict)
@@ -166,7 +245,6 @@ class Test(APIView):
             ("PUT","/phone/flag_spam/<str:number>"),
         )
         return Response(data)
-
 
 
 
