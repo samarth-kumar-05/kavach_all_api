@@ -22,4 +22,5 @@ urlpatterns = [
     path("upi/", include("upi_api.urls")),
     path("sms_header/", include("sms.urls")),
     path("phone/", include("phone.urls")),
+    path("wallet/", include("wallet.urls")),
 ]

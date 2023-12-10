@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     "upi_api",
     "rest_framework",
     "sms",
-    "phone"
+    "phone",
+    "wallet"
 ]
 
 MIDDLEWARE = [
